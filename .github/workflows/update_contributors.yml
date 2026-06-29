@@ -1,0 +1,75 @@
+name: Update Contributors
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get contributor info
+        id: info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+          AUTHOR=${{ github.event.pull_request.user.login }}
+          PR_BODY=$(gh pr view $PR_NUM --repo $REPO --json body -q '.body')
+
+          # Extract tool name from PR title (format: [tool] tool_name)
+          TOOL=$(echo "${{ github.event.pull_request.title }}" | grep -oP '\[tool\]\s*\K\S+' || echo "")
+
+          # Check if PR body mentions closing an issue
+          ISSUE_NUM=$(echo "$PR_BODY" | grep -oP '(?i)closes\s+#\K\d+' || echo "")
+
+          # Get the tool file from the PR if not found in title
+          if [ -z "$TOOL" ]; then
+            TOOL=$(gh pr diff $PR_NUM --repo $REPO | grep -oP '^\+\+\+ b/tools/\K[^.]+' | head -1 || echo "")
+          fi
+
+          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "tool=$TOOL" >> $GITHUB_OUTPUT
+
+      - name: Update README
+        run: |
+          AUTHOR="${{ steps.info.outputs.author }}"
+          TOOL="${{ steps.info.outputs.tool }}"
+
+          if [ -z "$AUTHOR" ]; then
+            echo "No author found, skipping"
+            exit 0
+          fi
+
+          # Check if contributor already exists in README
+          if grep -q "@$AUTHOR" README.md; then
+            echo "Contributor @$AUTHOR already in README"
+            # Update their tool list if new tool
+            if [ -n "$TOOL" ] && ! grep -q "$TOOL" README.md; then
+              sed -i "/| @$AUTHOR/ s| |, $TOOL |" README.md
+              echo "Added tool $TOOL to existing contributor $AUTHOR"
+            fi
+          else
+            # Add new contributor row before the closing comment
+            if [ -n "$TOOL" ]; then
+              NEW_ROW="| [@${AUTHOR}](https://github.com/${AUTHOR}) | ${TOOL} |"
+            else
+              NEW_ROW="| [@${AUTHOR}](https://github.com/${AUTHOR}) | contributor |"
+            fi
+            sed -i "/^<!-- Contributors/i\\$NEW_ROW" README.md
+            echo "Added new contributor $AUTHOR"
+          fi
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --staged --quiet || git commit -m "docs: add @${{ steps.info.outputs.author }} to contributors"
+          git push
