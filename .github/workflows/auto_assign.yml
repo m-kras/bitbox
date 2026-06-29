@@ -10,16 +10,26 @@ jobs:
     if: |
       !github.event.issue.pull_request &&
       (
-        contains(toJSON(github.event.comment.body), 'assign me') ||
+        contains(toJSON(github.event.comment.body), 'assign') ||
+        contains(toJSON(github.event.comment.body), 'claim') ||
         contains(toJSON(github.event.comment.body), 'take this') ||
-        contains(toJSON(github.event.comment.body), 'work on this') ||
-        contains(toJSON(github.event.comment.body), 'work on it') ||
-        contains(toJSON(github.event.comment.body), 'claim this') ||
-        contains(toJSON(github.event.comment.body), 'pick this up') ||
-        contains(toJSON(github.event.comment.body), 'take this up') ||
-        contains(toJSON(github.event.comment.body), 'give it a shot') ||
-        contains(toJSON(github.event.comment.body), 'give this a shot') ||
-        contains(toJSON(github.event.comment.body), 'tackle this')
+        contains(toJSON(github.event.comment.body), 'take it') ||
+        contains(toJSON(github.event.comment.body), 'take up') ||
+        contains(toJSON(github.event.comment.body), 'work on') ||
+        contains(toJSON(github.event.comment.body), 'pick this') ||
+        contains(toJSON(github.event.comment.body), 'pick it') ||
+        contains(toJSON(github.event.comment.body), 'tackle') ||
+        contains(toJSON(github.event.comment.body), 'interested') ||
+        contains(toJSON(github.event.comment.body), 'give it a') ||
+        contains(toJSON(github.event.comment.body), 'give this a') ||
+        contains(toJSON(github.event.comment.body), 'mine') ||
+        contains(toJSON(github.event.comment.body), 'want to') ||
+        contains(toJSON(github.event.comment.body), 'would like') ||
+        contains(toJSON(github.event.comment.body), 'i\'ll do') ||
+        contains(toJSON(github.event.comment.body), 'let me') ||
+        contains(toJSON(github.event.comment.body), 'i can do') ||
+        contains(toJSON(github.event.comment.body), 'on it') ||
+        contains(toJSON(github.event.comment.body), 'dibs')
       )
     permissions:
       issues: write
@@ -32,20 +42,21 @@ jobs:
           COMMENTER=${{ github.event.comment.user.login }}
           REPO=${{ github.repository }}
 
-          # Check if already assigned
           ASSIGNEES=$(gh api repos/$REPO/issues/$ISSUE_NUM --jq '.assignees[].login')
 
+          # Already assigned to this user
           if echo "$ASSIGNEES" | grep -q "^$COMMENTER$"; then
             echo "Already assigned to $COMMENTER"
             exit 0
           fi
 
-          # Check if someone else is already assigned
+          # First-come-first-serve: someone else got it
           if [ -n "$ASSIGNEES" ]; then
-            gh issue comment $ISSUE_NUM --repo $REPO --body "This issue is already assigned. Please pick another one!"
+            echo "Issue already taken by someone else"
+            gh issue comment $ISSUE_NUM --repo $REPO --body "Hey @$COMMENTER, this issue is already assigned to someone else. Please pick another one!"
             exit 0
           fi
 
           # Assign
           gh issue edit $ISSUE_NUM --repo $REPO --add-assignee "$COMMENTER"
-          gh issue comment $ISSUE_NUM --repo $REPO --body "Assigned to @$COMMENTER. Good luck!"
+          gh issue comment $ISSUE_NUM --repo $REPO --body "Assigned to @$COMMENTER! Good luck and have fun building this tool."
