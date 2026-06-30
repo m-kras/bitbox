@@ -66,7 +66,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. The short version:
 | [@AviDhandhania](https://github.com/AviDhandhania) | count_vowels |
 | [@AlexMnrs](https://github.com/AlexMnrs) | is_anagram |
 | [@prakhargaba007](https://github.com/prakhargaba007) | count_chars |
-| [@rdhadge](https://github.com/rdhadge) | title_case, repeat_string |
+| [@rdhadge](https://github.com/rdhadge) | title_case, repeat_string, base64_encode, base64_decode |
+| [@JingliangGao](https://github.com/JingliangGao) | is_uppercase |
+| [@Julito-Dev](https://github.com/Julito-Dev) | reverse_words |
 
 <!-- Contributors are added automatically after PRs are merged -->
 
