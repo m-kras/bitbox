@@ -65,5 +65,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. The short version:
 | [@abduznik](https://github.com/abduznik) | project scaffold, 7 seed tools |
 | [@AviDhandhania](https://github.com/AviDhandhania) | count_vowels |
 | [@AlexMnrs](https://github.com/AlexMnrs) | is_anagram |
+| [@prakhargaba007](https://github.com/prakhargaba007) | count_chars |
+| [@rdhadge](https://github.com/rdhadge) | title_case, repeat_string |
 
 <!-- Contributors are added automatically after PRs are merged -->
+
