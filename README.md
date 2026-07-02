@@ -71,6 +71,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines. The short version:
 | [@Julito-Dev](https://github.com/Julito-Dev) | reverse_words |
 | [@Diyaaa-12](https://github.com/Diyaaa-12) | absolute, is_odd |
 | [@Bruce191](https://github.com/Bruce191) | is_even, swap_case |
+| [@ishita-0301](https://github.com/ishita-0301) | kg_to_lbs, miles_to_km |
 
 <!-- Contributors are added automatically after PRs are merged -->
 
